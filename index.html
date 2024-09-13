@@ -19,27 +19,35 @@
 </header>
 <main>
 <section>
-<label for="funcao">Digite a função:</label>
-<textarea id="funcao" name="funcao" rows="1" cols="10"></textarea>
+<form action="/enviadados" id="dadosUsuario" method="post">
+    <label for="funcaoUsuario">Digite a função:</label>
+    <input type ="text" name="funcaoUsuario" id="funcaoUsuario" required placeholder="">
 
-<label for="derivada">Digite a derivada:</label>
-<textarea id="derivada" name="derivada" rows="1" cols="10"></textarea>
+    <label for="derivada">Digite a derivada da função:</label>
+    <input type ="text" name="derivada" id="derivada" required placeholder="">
 
-<label for="intervalo">Digite o intervalo:</label>
-<textarea id="int" name="intervalo" rows="1" cols="10"></textarea> <br>
+    <label for="valorInicial">Digite o valor inicial do intervalo:</label>
+    <input type ="number" name="valorInicial" id="valorInicial" required placeholder="">
 
-<label for="funcao">Digite a tolerancia:</label>
-<textarea id="tolerancia" name="tolerancia" rows="1" cols="10"></textarea>
+    <label for="valorFinal">Digite o valor final do intervalo:</label>
+    <input type ="number" name="valorFinal" id="valorFinal" required placeholder="">
 
-<label for="funcao">Digite a quantidade máxima de interações:</label>
-<textarea id="interacoes" name="interacoes" rows="1" cols="10"></textarea>
+    <label for="tolerancia">Digite a tolerancia de erro:</label>
+    <input type ="number" name="tolerancia" id="tolerancia" required placeholder="">
 
-<label for="funcao"><br>Escolha o método:<br>
-    1-Bissecção 2-Falsa Posição 3-Newton Raphson 4-Todos
-</label>
-<textarea id="funcao" name="funcao" rows="1" cols="10"></textarea>
+    <label for="interacoes">Digite a quantidade máxima de interações:</label>
+    <input type ="number" name="interacoes" id="interacoes" required placeholder="">
+
+    <label for="metodo"><br>Escolha o método:<br>
+        1-Bissecção 2-Falsa Posição 3-Newton Raphson 4-Todos:</label>
+    <input type ="number" name="metodo" id="metodo" required placeholder="">
+
+    <button type="submit" id="botaoEnviar">Enviar</button>
+    <button type="reset" id="botaoLimpar">Limpar</button>
+</form>
+
 </section>
-<button id="enviar">Enviar</button>
+
 </main>
 
 <script> </script>
