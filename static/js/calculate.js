@@ -56,26 +56,11 @@ $(document).ready(function () {
                 if (response.error) {
                     $('#erros').html('Erro: ' + response.error);
                 } else {
-                    let iteracoes = response.iteracoes;
+                    // Exibe o resultado
                     let resultado = response.resultado;
+                    $('#resultados').html('<h3>Resultado: ' + resultado + '</h3>');
 
-                    let resultadoHTML = '<h3>Resultado: ' + resultado + '</h3>';
-                    resultadoHTML += '<table border="1"><tr><th>Iteração</th><th>x</th><th>f(x)</th><th>Diferença</th></tr>';
 
-                    // Exibir todas as iterações
-                    iteracoes.forEach(function (iteracao) {
-                        resultadoHTML += '<tr>';
-                        resultadoHTML += '<td>' + iteracao.iteracao + '</td>';
-                        resultadoHTML += '<td>' + iteracao.x + '</td>';
-                        resultadoHTML += '<td>' + iteracao.f_x + '</td>';
-                        resultadoHTML += '<td>' + iteracao.diferenca + '</td>';
-                        resultadoHTML += '</tr>';
-                    });
-
-                    resultadoHTML += '</table>';
-
-                    // Exibir resultado
-                    $('#resultados').html(resultadoHTML);
                 }
             },
             error: function (xhr, status, error) {
