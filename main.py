@@ -198,7 +198,7 @@ def calcular():
         return jsonify({
             "iteracoes": resultados,
             "resultado": resultado or resultados[-1]['x']
-            "templates/grafico.png": data.graficogit 
+            "templates/grafico.png": data.grafico 
         })
     except Exception as e:
         logging.error(f"Erro durante o cálculo: {e}")
