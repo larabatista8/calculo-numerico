@@ -193,11 +193,12 @@ def calcular():
         plt.grid(True) #coloca linha de grade
 
         #salvando imagem 
-        plt.savefig('template/grafico.png')
-        
+        plt.savefig('templates/grafico.png')
+
         return jsonify({
             "iteracoes": resultados,
             "resultado": resultado or resultados[-1]['x']
+            "templates/grafico.png": data.graficogit 
         })
     except Exception as e:
         logging.error(f"Erro durante o cálculo: {e}")
