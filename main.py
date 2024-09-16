@@ -3,6 +3,7 @@ import numpy as np
 import logging
 import sympy as sp
 from sympy import symbols, sympify
+from matplotlib import pyplot as plt
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -179,6 +180,21 @@ def calcular():
         else:
             raise ValueError(f"Método desconhecido: {metodo}")
 
+        eixo_x= [x0,x1]
+        eixo_y= [torna_funcao(func_str, x0), torna_funcao(func_str, x1)]
+
+        #colocando legenda
+        plt.title('Grafico da função' + func_str)
+        plt.xlabel('Eixo x')
+        plt.ylabel('Eixo y')
+
+        #gerando grafico
+        plt.plot(eixo_x, eixo_y)
+        plt.grid(True) #coloca linha de grade
+
+        #salvando imagem 
+        plt.savefig('template/grafico.png')
+        
         return jsonify({
             "iteracoes": resultados,
             "resultado": resultado or resultados[-1]['x']

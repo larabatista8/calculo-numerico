@@ -86,6 +86,7 @@
                     // Guarda o resultado anterior no campo hidden e exibe o resultado
                     document.getElementById("resultado-anterior").value = data.resultado;
                     document.getElementById("resultados").innerHTML = 'Resultado: ' + data.resultado;
+                    document.getElementById('grafico').src = data.grafico;
                 }
             })
             .catch(error => {
