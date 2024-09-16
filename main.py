@@ -180,8 +180,8 @@ def calcular():
         else:
             raise ValueError(f"Método desconhecido: {metodo}")
 
-        eixo_x= [x0,x1]
-        eixo_y= [torna_funcao(func_str, x0), torna_funcao(func_str, x1)]
+        eixo_x= [x0,(x0+2)]
+        eixo_y= [torna_funcao(func_str, x0), torna_funcao(func_str, (x0+2))]
 
         #colocando legenda
         plt.title('Grafico da função' + func_str)
