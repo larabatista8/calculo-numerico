@@ -60,7 +60,10 @@ $(document).ready(function () {
                     let resultado = response.resultado;
                     $('#resultados').html('<h3>Resultado: ' + resultado + '</h3>');
 
-
+                    // Atualiza o gráfico
+                    if (response.grafico_url) {
+                        $('#grafico').attr('src', response.grafico_url);
+                    }
                 }
             },
             error: function (xhr, status, error) {
