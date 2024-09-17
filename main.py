@@ -4,6 +4,7 @@ import logging
 import sympy as sp
 from sympy import symbols, sympify
 from matplotlib import pyplot as plt
+plt.switch_backend('agg')
 import io
 import base64
 
