@@ -13,7 +13,7 @@
         <option value="newton">Newton-Raphson</option>
         <option value="secante">Secante</option>
         <option value="bisseccao">Bissecção</option>
-        <option value="falsa_posicao">Falsa Posição </option>
+        <option value="falsa_posicao">Falsa Posição</option>
     </select><br>
 
     <label for="funcao">Digite a função:</label>
@@ -32,18 +32,16 @@
     <input type="number" id="max_iter" value="100"><br>
 
     <label>
-        <input type="checkbox" id="use-resultado-antigo">Usar resultado anterior</label> 
-        <input type="hidden" id="resultado-anterior"> 
-      </label>
-      <br>  
-        
+        <input type="checkbox" id="use-resultado-antigo">Usar resultado anterior
+    </label>
+    <input type="hidden" id="resultado-anterior">
+    <br>  
+
     <button onclick="calcular()">Calcular</button>
 
     <div id="resultados"></div>
+    <img id="grafico" src="" alt="Gráfico da função" />
     <div id="erros" style="color: red;"></div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="calculo.js"></script>
 
     <script>
         function calcular() {
@@ -70,8 +68,6 @@
                 bodyData.x1 = x1; // Enviar x1 para secante, bissecção e falsa posição
             }
 
-            // Fetch para usar o request post
-
             fetch('/calcular', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -79,18 +75,15 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.erro) {
-                    // Exibe erros
-                    document.getElementById("erros").innerHTML = 'Erro: ' + data.erro;
+                if (data.error) {
+                    document.getElementById("erros").innerHTML = 'Erro: ' + data.error;
                 } else {
-                    // Guarda o resultado anterior no campo hidden e exibe o resultado
                     document.getElementById("resultado-anterior").value = data.resultado;
                     document.getElementById("resultados").innerHTML = 'Resultado: ' + data.resultado;
-                    document.getElementById('grafico').src = data.grafico;
+                    document.getElementById('grafico').src = data.grafico_url;
                 }
             })
             .catch(error => {
-                // Tratamento de erros de requisição
                 document.getElementById("erros").innerHTML = 'Erro no cálculo: ' + error.message;
             });
         }
