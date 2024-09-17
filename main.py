@@ -4,6 +4,8 @@ import logging
 import sympy as sp
 from sympy import symbols, sympify
 from matplotlib import pyplot as plt
+import io
+import base64
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -13,10 +15,6 @@ app = Flask(__name__)
 def torna_funcao(func_str, x):
     try:
         x_sym = symbols('x')
-        e_val = np.e
-        pi_val = np.pi
-        func_str = func_str.replace('e', str(e_val))  
-        func_str = func_str.replace('pi', str(pi_val))  
         func = sympify(func_str)
         return float(func.evalf(subs={x_sym: x}))
     except Exception as e:
@@ -64,7 +62,7 @@ def newton_raphson(func_str, deriv_func_str, x0, tol, max_iter):
         i += 1
     return iteracoes
 
-# secantee
+# Secante
 def secante(func_str, x1, x2, tol, max_iter):
     iteracoes = []
     func = lambda x: torna_funcao(func_str, x)
@@ -180,11 +178,12 @@ def calcular():
         else:
             raise ValueError(f"Método desconhecido: {metodo}")
 
+        # Gerar gráfico
         eixo_x= [x0,(x0+2)]
         eixo_y= [torna_funcao(func_str, x0), torna_funcao(func_str, (x0+2))]
 
         #colocando legenda
-        plt.title('Grafico da função' + func_str)
+        plt.title('Grafico da função ' + func_str)
         plt.xlabel('Eixo x')
         plt.ylabel('Eixo y')
 
@@ -192,13 +191,17 @@ def calcular():
         plt.plot(eixo_x, eixo_y)
         plt.grid(True) #coloca linha de grade
 
-        #salvando imagem 
-        plt.savefig('templates/grafico.png')
+        # Salvar gráfico em base64
+        img = io.BytesIO()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        grafico_url = base64.b64encode(img.getvalue()).decode('utf-8')
+        plt.close()
 
         return jsonify({
             "iteracoes": resultados,
-            "resultado": resultado or resultados[-1]['x']
-            "templates/grafico.png": data.grafico 
+            "resultado": resultado if resultado is not None else (resultados[-1]['x'] if resultados else None),
+            "grafico_url": f'data:image/png;base64,{grafico_url}'
         })
     except Exception as e:
         logging.error(f"Erro durante o cálculo: {e}")
