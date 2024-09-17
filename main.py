@@ -44,19 +44,21 @@ def newton_raphson(func_str, deriv_func_str, x0, tol, max_iter):
         raise ValueError("A derivada é zero, o que pode causar problemas na convergência.")
     
     i = 0
-    while abs(h) >= tol and i < max_iter:
+    while i < max_iter:
         try:
             h = func(x0) / deriv_func(x0)
         except ZeroDivisionError:
             raise ValueError("A derivada é zero, o que pode causar problemas na convergência.")
-        
+        if abs(h) < tol or abs(fx) < tol:
+            break
+            
         x1 = x0 - h
         fx = func(x1)
         iteracoes.append({
             "iteracao": i,
             "x": x1,
             "f_x": fx,
-            "diferenca": abs(fx - tol)
+            "diferenca": abs(fx)
         })
         
         x0 = x1
@@ -68,7 +70,7 @@ def secante(func_str, x1, x2, tol, max_iter):
     iteracoes = []
     func = lambda x: torna_funcao(func_str, x)
     for i in range(max_iter):
-        if abs(func(x2) - func(x1)) < tol:
+        if abs((func(x2) - func(x1))/func(x2)) < tol:
             break
         x0 = x2 - func(x2) * (x2 - x1) / (func(x2) - func(x1))
         fx = func(x0)
@@ -76,10 +78,8 @@ def secante(func_str, x1, x2, tol, max_iter):
             "iteracao": i,
             "x": x0,
             "f_x": fx,
-            "diferenca": abs(fx - tol)
+            "diferenca": abs(fx)
         })
-        if abs(x0 - x2) < tol:
-            break
         x1, x2 = x2, x0
     return iteracoes
 
