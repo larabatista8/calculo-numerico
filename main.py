@@ -49,6 +49,7 @@ def newton_raphson(func_str, deriv_func_str, x0, tol, max_iter):
             h = func(x0) / deriv_func(x0)
         except ZeroDivisionError:
             raise ValueError("A derivada é zero, o que pode causar problemas na convergência.")
+        fx = func(x0)
         if abs(h) < tol or abs(fx) < tol:
             break
             
