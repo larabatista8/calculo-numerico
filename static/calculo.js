@@ -52,7 +52,10 @@ $(document).ready(function () {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
+            
+            //Resposta do Flask
             success: function (response) {
+                //Erro
                 if (response.error) {
                     $('#erros').html('Erro: ' + response.error);
                 } else {
@@ -76,6 +79,7 @@ $(document).ready(function () {
                     }
                 }
             },
+            //Erro
             error: function (xhr, status, error) {
                 $('#erros').html('Erro no cálculo: ' + error);
             }
