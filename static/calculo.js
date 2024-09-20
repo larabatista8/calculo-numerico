@@ -48,7 +48,7 @@ $(document).ready(function () {
 
         // Envio dos dados via AJAX para que o navegador não recarregue
         $.ajax({
-            url: '/calcular',
+            url: url,
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
@@ -56,11 +56,21 @@ $(document).ready(function () {
                 if (response.error) {
                     $('#erros').html('Erro: ' + response.error);
                 } else {
-                    // Exibe o resultado
-                    let resultado = response.resultado;
-                    $('#resultados').html('<h3>Resultado: ' + resultado + '</h3>');
+                    if (metodo === 'todos') {
+                        // Exibir os resultados para todos os métodos
+                        let resultadosHtml = '<h3>Resultados:</h3>';
+                        resultadosHtml += '<p>Newton-Raphson: ' + response.newton + '</p>';
+                        resultadosHtml += '<p>Secante: ' + response.secante + '</p>';
+                        resultadosHtml += '<p>Bissecção: ' + response.bisseccao + '</p>';
+                        resultadosHtml += '<p>Falsa Posição: ' + response.falsa_posicao + '</p>';
+                        $('#resultados').html(resultadosHtml);
+                    } else {
+                        // Exibir o resultado para o método específico
+                        let resultado = response.resultado;
+                        $('#resultados').html('<h3>Resultado: ' + resultado + '</h3>');
+                    }
 
-                    // Atualiza o gráfico
+                    // Atualiza o gráfico se disponível
                     if (response.grafico_url) {
                         $('#grafico').attr('src', response.grafico_url);
                     }
