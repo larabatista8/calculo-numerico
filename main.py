@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import numpy as np
 import logging
 import sympy as sp
-from sympy import symbols, sympify
+from sympy import symbols, sympify, pi, E, sin, cos, tan
 from matplotlib import pyplot as plt
 plt.switch_backend('agg')
 import io
@@ -16,13 +16,13 @@ app = Flask(__name__)
 def torna_funcao(func_str, x):
     try:
         x_sym = symbols('x')
-        func = sympify(func_str)
+        func = sympify(func_str, locals={'pi': pi, 'e': E, 'sin': sin, 'cos': cos, 'tan': tan})
         return float(func.evalf(subs={x_sym: x}))
     except Exception as e:
         logging.error(f"Erro ao avaliar a função: {e}")
         raise ValueError("Erro ao avaliar a função. Certifique-se de que a função está no formato correto.")
-
-# Derivada da função 
+    
+# Derivada da função     
 def get_derivada(func_str):
     try:
         x_sym = sp.Symbol('x')
@@ -32,6 +32,31 @@ def get_derivada(func_str):
     except Exception as e:
         logging.error(f"Erro ao calcular a derivada: {e}")
         raise ValueError("Erro ao calcular a derivada. Certifique-se de que a função está no formato correto.")
+
+def gerar_grafico(func_str, pontos, x0, x1):
+    
+    # Gerar gráfico
+    eixo_x = np.linspace(x0 - 2, (x1 + 2) if x1 else (x0 + 2), 100)
+    eixo_y = [torna_funcao(func_str, x) for x in eixo_x]
+    plt.figure()
+    plt.plot(eixo_x, eixo_y, label='Função')
+    plt.scatter([p['x'] for p in pontos], [p['f_x'] for p in pontos], color='red', label='Iterações')
+
+    #colocando legenda
+    plt.title('Gráfico da função ' + func_str)
+    plt.xlabel('Valores de x')
+    plt.ylabel('Valores de f(x)')
+    plt.legend()
+    plt.grid(True)
+    
+    # Salvar gráfico em base64
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    grafico_url = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close()
+
+    return f'data:image/png;base64,{grafico_url}'
 
 # Newton-Raphson
 def newton_raphson(func_str, deriv_func_str, x0, tol, max_iter):
@@ -52,87 +77,100 @@ def newton_raphson(func_str, deriv_func_str, x0, tol, max_iter):
         fx = func(x0)
         if abs(h) < tol or abs(fx) < tol:
             break
-            
         x1 = x0 - h
         fx = func(x1)
         iteracoes.append({
             "iteracao": i,
             "x": x1,
             "f_x": fx,
-            "diferenca": abs(fx)
+            "diferenca": abs(fx - tol)
         })
-        
+        if abs(x1 - x0) < tol:
+            break
         x0 = x1
         i += 1
-    return iteracoes
+
+    return iteracoes, x0
 
 # Secante
-def secante(func_str, x1, x2, tol, max_iter):
+def secante(func_str, x0, x1, tol, max_iter):
     iteracoes = []
     func = lambda x: torna_funcao(func_str, x)
-    for i in range(max_iter):
-        if abs((func(x2) - func(x1))/func(x2)) < tol:
-            break
-        x0 = x2 - func(x2) * (x2 - x1) / (func(x2) - func(x1))
-        fx = func(x0)
+    i = 0
+    while i < max_iter:
+        fx0 = func(x0)
+        fx1 = func(x1)
+        if fx1 - fx0 == 0:
+            raise ValueError("Divisão por zero detectada.")
+        x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0)
+        fx2 = func(x2)
         iteracoes.append({
             "iteracao": i,
-            "x": x0,
-            "f_x": fx,
-            "diferenca": abs(fx)
+            "x": x2,
+            "f_x": fx2,
+            "diferenca": abs(x2 - x1)
         })
-        x1, x2 = x2, x0
-    return iteracoes
+        if abs(x2 - x1) < tol or abs(fx2) < tol:
+            break
+        x0, x1 = x1, x2
+        i += 1
+
+
+    return iteracoes, x2
 
 # Bissecção
-def bisseccao(func_str, a, b, tol, max_iter):
+def bisseccao(func_str, x0, x1, tol, max_iter):
     iteracoes = []
     func = lambda x: torna_funcao(func_str, x)
-    if func(a) * func(b) >= 0:
-        logging.error("Os valores iniciais a e b devem ter sinais opostos.")
-        return "Você não assumiu os valores corretos de a e b.", []
-    
-    for i in range(max_iter):
-        c = (a + b) / 2.0
-        fx = func(c)
+    if func(x0) * func(x1) > 0:
+        raise ValueError("Os valores iniciais devem estar em intervalos que contêm a raiz.")
+    i = 0
+    while i < max_iter:
+        xm = (x0 + x1) / 2
+        fxm = func(xm)
         iteracoes.append({
             "iteracao": i,
-            "x": c,
-            "f_x": fx,
-            "diferenca": abs(fx - tol)
+            "x": xm,
+            "f_x": fxm,
+            "diferenca": abs((fxm - tol))
         })
-        if abs(fx) < tol or abs(b - a) < tol:
+        if abs(fxm) < tol or abs(x1 - x0) < tol:
             break
-        if func(c) * func(a) < 0:
-            b = c
+        if func(x0) * fxm < 0:
+            x1 = xm
         else:
-            a = c
-    return c, iteracoes
+            x0 = xm
+        i += 1
+
+    return iteracoes, xm
 
 # Falsa Posição
-def falsa_pos(func_str, a, b, tol, max_iter):
+def falsa_posicao(func_str, x0, x1, tol, max_iter):
     iteracoes = []
     func = lambda x: torna_funcao(func_str, x)
-    if func(a) * func(b) >= 0:
-        return "Você não assumiu os valores corretos de a e b.", []
-    
-    c = a
-    for i in range(max_iter):
-        c = (a * func(b) - b * func(a)) / (func(b) - func(a))
-        fx = func(c)
+    if func(x0) * func(x1) > 0:
+        raise ValueError("Os valores iniciais devem estar em intervalos que contêm a raiz.")
+    i = 0
+    while i < max_iter:
+        fx0 = func(x0)
+        fx1 = func(x1)
+        xm = x1 - fx1 * (x1 - x0) / (fx1 - fx0)
+        fxm = func(xm)
         iteracoes.append({
             "iteracao": i,
-            "x": c,
-            "f_x": fx,
-            "diferenca": abs(fx - tol)
+            "x": xm,
+            "f_x": fxm,
+            "diferenca": abs(fxm - tol)
         })
-        if abs(fx) < tol:
+        if abs(fxm) < tol or abs(x1 - x0) < tol:
             break
-        if func(c) * func(a) < 0:
-            b = c
+        if func(x0) * fxm < 0:
+            x1 = xm
         else:
-            a = c
-    return c, iteracoes
+            x0 = xm
+        i += 1
+
+    return iteracoes, xm
 
 # Página inicial
 @app.route('/')
@@ -142,72 +180,73 @@ def index():
 # Cálculo
 @app.route('/calcular', methods=['POST'])
 def calcular():
+    data = request.get_json()
+    metodo = data.get('metodo')
+    func_str = data.get('funcao')
+    x0 = data.get('x0')
+    x1 = data.get('x1')
+    tol = data.get('tol')
+    max_iter = data.get('max_iter')
+
+    results = {}
+
     try:
-        data = request.json
-        metodo = data.get('metodo')
-        func_str = data.get('funcao')
-        x0 = data.get('x0')
-        x1 = data.get('x1')
-        use_resultado_antigo = data.get('use_resultado_antigo', False)
-        resultado_anterior = data.get('resultado_anterior', None)
-        
-        if not func_str:
-            raise ValueError("A função deve ser fornecida.")
-        
-        if use_resultado_antigo and resultado_anterior:
-            x0 = float(resultado_anterior)
-        else:
-            if not x0:
-                raise ValueError("O valor de x0 deve ser fornecido.")
-            x0 = float(x0)
-        
-        x1 = float(x1) if x1 else None
-        tol = float(data.get('tol'))
-        max_iter = int(data.get('max_iter'))
-
-        resultados = []
-        resultado = None
-
-        if metodo == "newton":
+    #Metodos individuais
+        if metodo == 'newton':
             deriv_func_str = get_derivada(func_str)
-            resultados = newton_raphson(func_str, deriv_func_str, x0, tol, max_iter)
-        elif metodo == "secante":
-            resultados = secante(func_str, x0, x1, tol, max_iter)
-        elif metodo == "bisseccao":
-            resultado, resultados = bisseccao(func_str, x0, x1, tol, max_iter)
-        elif metodo == "falsa_posicao":
-            resultado, resultados = falsa_pos(func_str, x0, x1, tol, max_iter)
+            iteracoes, resultado = newton_raphson(func_str, deriv_func_str, x0, tol, max_iter)
+            results['newton'] = {
+                "resultado": resultado,
+                "iteracoes": iteracoes,
+                "grafico_url": gerar_grafico(func_str, iteracoes, x0, x0)  # x1 é o mesmo que x0 para o gráfico
+            }
+        elif metodo == 'secante':
+            iteracoes, resultado = secante(func_str, x0, x1, tol, max_iter)
+            results['secante'] = {
+                "resultado": resultado,
+                "iteracoes": iteracoes,
+                "grafico_url": gerar_grafico(func_str, iteracoes, x0, x1)
+            }
+        elif metodo == 'bisseccao':
+            iteracoes, resultado = bisseccao(func_str, x0, x1, tol, max_iter)
+            results['bisseccao'] = {
+                "resultado": resultado,
+                "iteracoes": iteracoes,
+                "grafico_url": gerar_grafico(func_str, iteracoes, x0, x1)
+            }
+        elif metodo == 'falsa_posicao':
+            iteracoes, resultado = falsa_posicao(func_str, x0, x1, tol, max_iter)
+            results['falsa_posicao'] = {
+                "resultado": resultado,
+                "iteracoes": iteracoes,
+                "grafico_url": gerar_grafico(func_str, iteracoes, x0, x1)
+            }
+
+    #Todos os métodos    
+        elif metodo == 'todos':
+            for m in ['newton', 'secante', 'bisseccao', 'falsa_posicao']:
+                if m == 'newton':
+                    deriv_func_str = get_derivada(func_str)
+                    iteracoes, resultado = newton_raphson(func_str, deriv_func_str, x0, tol, max_iter)
+                elif m == 'secante':
+                    iteracoes, resultado = secante(func_str, x0, x1, tol, max_iter)
+                elif m == 'bisseccao':
+                    iteracoes, resultado = bisseccao(func_str, x0, x1, tol, max_iter)
+                elif m == 'falsa_posicao':
+                    iteracoes, resultado = falsa_posicao(func_str, x0, x1, tol, max_iter)
+                results[m] = {
+                    "resultado": resultado,
+                    "iteracoes": iteracoes,
+                    "grafico_url": gerar_grafico(func_str, iteracoes, x0, x1)
+                }
         else:
-            raise ValueError(f"Método desconhecido: {metodo}")
+            raise ValueError("Método desconhecido.")
 
-        # Gerar gráfico
-        eixo_x= [x0,(x0+2)]
-        eixo_y= [torna_funcao(func_str, x0), torna_funcao(func_str, (x0+2))]
-
-        #colocando legenda
-        plt.title('Grafico da função ' + func_str)
-        plt.xlabel('Eixo x')
-        plt.ylabel('Eixo y')
-
-        #gerando grafico
-        plt.plot(eixo_x, eixo_y)
-        plt.grid(True) #coloca linha de grade
-
-        # Salvar gráfico em base64
-        img = io.BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        grafico_url = base64.b64encode(img.getvalue()).decode('utf-8')
-        plt.close()
-
-        return jsonify({
-            "iteracoes": resultados,
-            "resultado": resultado if resultado is not None else (resultados[-1]['x'] if resultados else None),
-            "grafico_url": f'data:image/png;base64,{grafico_url}'
-        })
+        return jsonify(results)
+    
     except Exception as e:
-        logging.error(f"Erro durante o cálculo: {e}")
-        return jsonify({"error": str(e)}), 500
+        logging.error(f"Erro no cálculo: {e}")
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
