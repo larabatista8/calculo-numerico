@@ -3,51 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Numérica</title>
+    <title>Calculadora para Equações Não Lineares</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <h1>Calculadora Numérica</h1>
+    <div class="container">
+        <div class="form-header">
+            <h1>Calculadora para Resolução de Equações Não Lineares</h1>
+        </div>
 
-    <label for="metodo">Escolha o método:</label>
-    <select id="metodo">
-        <option value="newton">Newton-Raphson</option>
-        <option value="secante">Secante</option>
-        <option value="bisseccao">Bissecção</option>
-        <option value="falsa_posicao">Falsa Posição</option>
-        <option value="todos">Calcular com todos os métodos</option>
-    </select><br>
+        <div class="content">
+            <div class="form">
+                <div class="input-group">
+                    <div class="input-box">
+                        <label for="metodo">Escolha o método:</label>
+                        <select id="metodo">
+                            <option value="newton">Newton-Raphson</option>
+                            <option value="secante">Secante</option>
+                            <option value="bisseccao">Bissecção</option>
+                            <option value="falsa_posicao">Falsa Posição</option>
+                            <option value="todos">Calcular com todos os métodos</option>
+                        </select>
+                    </div>
 
-    <label for="funcao">Digite a função:</label>
-    <input type="text" id="funcao" placeholder="x**3 - 2*x - 5"><br>
+                    <div class="input-box">
+                        <label for="funcao">Digite a função:</label>
+                        <input type="text" id="funcao" placeholder="x**3 - 2*x - 5" required>
+                    </div>
 
-    <label for="x0">Valor inicial (x0):</label>
-    <input type="number" id="x0" step="any"><br>
+                    <div class="input-box">
+                        <label for="x0">Valor inicial (x0):</label>
+                        <input type="number" id="x0" step="any" required>
+                    </div>
 
-    <label for="x1" id="x1-label">Valor inicial (x1) (para secante/bissecção/falsa posição):</label>
-    <input type="number" id="x1" step="any"><br>
+                    <div class="input-box">
+                        <label for="x1" id="x1-label">Valor inicial (x1):</label>
+                        <input type="number" id="x1" step="any">
+                    </div>
 
-    <label for="tol">Digite a tolerância:</label>
-    <input type="number" id="tol" step="any" value="0.001"><br>
+                    <div class="input-box">
+                        <label for="tol">Tolerância:</label>
+                        <input type="number" id="tol" step="any" value="0.001" required>
+                    </div>
 
-    <label for="max_iter">Digite a quantidade máxima de iterações:</label>
-    <input type="number" id="max_iter" value="100"><br>
+                    <div class="input-box">
+                        <label for="max_iter">Máximo de Iterações:</label>
+                        <input type="number" id="max_iter" value="100" required>
+                    </div>
+                </div>
 
-    <label>
-        <input type="checkbox" id="use-resultado-antigo">Usar resultado anterior
-    </label>
-    <input type="hidden" id="resultado-anterior">
-    <br>  
+                <div class="button-group">
+                    <button type="button" onclick="calcular()">Calcular</button>
+                    <button type="button" onclick="window.print()">Gerar PDF</button>
+                    <button type="button" class="limpar" onclick="limpar()">
+                        <i class="fas fa-broom"></i> Limpar
+                    </button>
+                </div>
 
-    <button onclick="calcular()">Calcular</button>
-    <button onclick= "window.print()" >Gerar PDF</button>
+                <div id="erros" style="color: red;"></div>
+            </div>
 
-    <div id="resultados"></div>
-    <div id="erros" style="color: red;"></div>
+            <div id="resultados" style="flex: 1; margin-left: 20px;"></div>
+        </div>
+    </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.0.0/math.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='calculo.js') }}"></script>
     <script>
     function calcular() {
-
-        //Transformar os ID's em váriaveis
         const metodo = document.getElementById("metodo").value;
         const funcao = document.getElementById("funcao").value;
         const x0 = document.getElementById("x0").value;
@@ -55,13 +80,12 @@
         const tol = document.getElementById("tol").value;
         const max_iter = document.getElementById("max_iter").value;
 
-        //Validação
+        // Validação
         if (!funcao || !x0 || !tol || !max_iter) {
             document.getElementById("erros").innerHTML = "Por favor, preencha todos os campos obrigatórios.";
             return;
         }
-        
-        //Corpo do objeto
+
         const bodyData = { 
             metodo, 
             funcao, 
@@ -71,17 +95,14 @@
         };
 
         if (metodo !== "newton") {
-            bodyData.x1 = x1 ? parseFloat(x1) : null; // x1 é obrigatório para alguns métodos
+            bodyData.x1 = x1 ? parseFloat(x1) : null;
         }
 
-        //Envio dos dados para o calculo.js
         fetch("/calcular", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(bodyData)
         })
-
-        //Recebimento da resposta do main.py
         .then(response => {
             if (!response.ok) {
                 throw new Error('Erro ao calcular: ' + response.statusText);
@@ -89,104 +110,70 @@
             return response.json();
         })
         .then(data => {
-    if (data.error) {
-
-        //Erro
-        document.getElementById("erros").innerHTML = 'Erro: ' + data.error;
-    } else {
-        let resultadosHtml = '<h3>Resultados:</h3>';
-        if (metodo === 'todos') {
-
-            // Exibe o gráfico
-            for (const [key, value] of Object.entries(data)) {
-                resultadosHtml += `<div class="result-container">
-                                    <h2>${key.replace('_', ' ').toUpperCase()}</h2>
-                                    <p>Resultado: ${value.resultado}</p>
-                                    <img src="${value.grafico_url}" alt="Gráfico ${key.replace('_', ' ')}">`;
-
-                // Verifica se iteracoes existem
-                if (value.iteracoes && value.iteracoes.length > 0) {
-                         //<table>
-                           //<thead>
-                                //<tr>
-                                    //<th>Iteração</th>
-                                    //<th>x</th>
-                                    //<th>f(x)</th>
-                                    //<th>Diferença</th>
-                                //</tr>
-                            //</thead>
-                           //<tbody>
-                          //</tbody>
-                        //</table>
-
-                    //Montagem do cabeçalho da tabela
-                    resultadosHtml += '<table><thead><tr><th>Iteração</th><th>x</th><th>f(x)</th><th>Diferença</th></tr></thead><tbody>';
- 
-                    value.iteracoes.forEach(iteracao => {
-                        
-                        //Montagem dos dados da tabela
-                        resultadosHtml += `<tr>
-                                              <td>${iteracao.iteracao}</td>
-                                              <td>${iteracao.x}</td>
-                                              <td>${iteracao.f_x}</td>
-                                              <td>${iteracao.diferenca}</td>
-                                           </tr>`;
-                    });
-
-                    // Finalização
-                    resultadosHtml += '</tbody></table></div>';
-                } else {
-
-                    //Erro
-                    resultadosHtml += '<p>Nenhuma iteração disponível.</p>';
-                }
-            }
-        } else {
-            
-            //Cabeçalho
-            resultadosHtml += `<h2>${metodo.replace('_', ' ').toUpperCase()}</h2>
-                               <p>Resultado: ${data[metodo].resultado}</p>
-                               <img src="${data[metodo].grafico_url}" alt="Gráfico ${metodo.replace('_', ' ')}">`;
-
-            // Verifica se iteracoes existe
-            if (data[metodo].iteracoes && data[metodo].iteracoes.length > 0) {
-
-                //Montagem da tabela
-                resultadosHtml += '<table><thead><tr><th>Iteração</th><th>x</th><th>f(x)</th><th>Diferença</th></tr></thead><tbody>';
-                data[metodo].iteracoes.forEach(iteracao => {
-
-                    //Montagem dos dados da tabela
-                    resultadosHtml += `<tr>
-                                          <td>${iteracao.iteracao}</td>
-                                          <td>${iteracao.x}</td>
-                                          <td>${iteracao.f_x}</td>
-                                          <td>${iteracao.diferenca}</td>
-                                       </tr>`;
-                });
-
-                // Finalização
-                resultadosHtml += '</tbody></table>';
+            if (data.error) {
+                document.getElementById("erros").innerHTML = 'Erro: ' + data.error;
             } else {
+                let resultadosHtml = '<h3>Resultados:</h3>';
+                if (metodo === 'todos') {
+                    for (const [key, value] of Object.entries(data)) {
+                        resultadosHtml += `<div class="result-container">
+                                            <h2>${key.replace('_', ' ').toUpperCase()}</h2>
+                                            <p>Resultado: ${value.resultado}</p>
+                                            <img src="${value.grafico_url}" alt="Gráfico ${key.replace('_', ' ')}">`;
 
-                //Erro
-                resultadosHtml += '<p>Nenhuma iteração disponível.</p>';
+                        if (value.iteracoes && value.iteracoes.length > 0) {
+                            resultadosHtml += '<table><thead><tr><th>Iteração</th><th>x</th><th>f(x)</th><th>Diferença</th></tr></thead><tbody>';
+                            value.iteracoes.forEach(iteracao => {
+                                resultadosHtml += `<tr>
+                                                      <td>${iteracao.iteracao}</td>
+                                                      <td>${iteracao.x}</td>
+                                                      <td>${iteracao.f_x}</td>
+                                                      <td>${iteracao.diferenca}</td>
+                                                   </tr>`;
+                            });
+                            resultadosHtml += '</tbody></table></div>';
+                        } else {
+                            resultadosHtml += '<p>Nenhuma iteração disponível.</p>';
+                        }
+                    }
+                } else {
+                    resultadosHtml += `<h2>${metodo.replace('_', ' ').toUpperCase()}</h2>
+                                       <p>Resultado: ${data[metodo].resultado}</p>
+                                       <img src="${data[metodo].grafico_url}" alt="Gráfico ${metodo.replace('_', ' ')}">`;
+
+                    if (data[metodo].iteracoes && data[metodo].iteracoes.length > 0) {
+                        resultadosHtml += '<table><thead><tr><th>Iteração</th><th>x</th><th>f(x)</th><th>Diferença</th></tr></thead><tbody>';
+                        data[metodo].iteracoes.forEach(iteracao => {
+                            resultadosHtml += `<tr>
+                                                  <td>${iteracao.iteracao}</td>
+                                                  <td>${iteracao.x}</td>
+                                                  <td>${iteracao.f_x}</td>
+                                                  <td>${iteracao.diferenca}</td>
+                                               </tr>`;
+                        });
+                        resultadosHtml += '</tbody></table>';
+                    } else {
+                        resultadosHtml += '<p>Nenhuma iteração disponível.</p>';
+                    }
+                }
+
+                document.getElementById("resultados").innerHTML = resultadosHtml;
             }
-        }
-
-        //Construção do conteúdo concluida e atualização da interface
-        document.getElementById("resultados").innerHTML = resultadosHtml;
-
-        //Coleta do gráfico e atualização da fonte da imagem
-        const graficoImg = document.getElementById('grafico');
-        if (graficoImg && data[metodo] && data[metodo].grafico_url) {
-            graficoImg.src = data[metodo].grafico_url;
-        }
+        })
+        .catch(error => {
+            document.getElementById("erros").innerHTML = 'Erro no cálculo: ' + error.message;
+        });
     }
-})
-.catch(error => {
-    //Erro
-    document.getElementById("erros").innerHTML = 'Erro no cálculo: ' + error.message;
-});
+
+    function limpar() {
+        document.getElementById("metodo").selectedIndex = 0;
+        document.getElementById("funcao").value = '';
+        document.getElementById("x0").value = '';
+        document.getElementById("x1").value = '';
+        document.getElementById("tol").value = '0.001';
+        document.getElementById("max_iter").value = '100';
+        document.getElementById("erros").innerHTML = '';
+        document.getElementById("resultados").innerHTML = '';
     }
     </script>
 </body>
