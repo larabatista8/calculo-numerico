@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import numpy as np
 import logging
 import sympy as sp
-from sympy import symbols, sympify, pi, E, sin, cos, tan
+from sympy import symbols, sympify, pi, E, sin, cos, tan, log, exp, sqrt
 from matplotlib import pyplot as plt
 plt.switch_backend('agg')
 import io
@@ -16,7 +16,7 @@ app = Flask(__name__)
 def torna_funcao(func_str, x):
     try:
         x_sym = symbols('x')
-        func = sympify(func_str, locals={'pi': pi, 'e': E, 'sin': sin, 'cos': cos, 'tan': tan})
+        func = sympify(func_str, locals={'pi': pi, 'e': E, 'sin': sin, 'cos': cos, 'tan': tan, 'log':log, 'sqrt':sqrt, 'exp':exp})
         return float(func.evalf(subs={x_sym: x}))
     except Exception as e:
         logging.error(f"Erro ao avaliar a função: {e}")
@@ -244,7 +244,7 @@ def calcular():
 
         return jsonify(results)
     
-    except Exception as e:
+    except ValueError as e:
         logging.error(f"Erro no cálculo: {e}")
         return jsonify({"error": str(e)}), 400
 
