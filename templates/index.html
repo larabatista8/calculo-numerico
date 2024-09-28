@@ -14,8 +14,8 @@
         </div>
 
         <div class="content">
-            <div class="form">
-                <div class="input-group">
+            <div class="form" >
+                <div class="input-group" id="form-input">
                     <div class="input-box">
                         <label for="metodo">Escolha o método:</label>
                         <select id="metodo">
@@ -52,6 +52,11 @@
                         <input type="number" id="max_iter" value="100" required>
                     </div>
                 </div>
+                <label>
+                    <input type="checkbox" id="use-resultado-antigo">Usar resultado anterior
+                </label>
+                <input type="hidden" id="resultado-anterior">
+                <br> 
 
                 <div class="button-group">
                     <button type="button" onclick="calcular()">Calcular</button>
