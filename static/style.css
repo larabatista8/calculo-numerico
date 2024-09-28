@@ -1,92 +1,150 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap');
+
+* {
     padding: 0;
-    background-color: #f4f4f4;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+   
+    justify-content: center;
+    align-items: center;
+    background: #151f54; /* Cor de fundo mais clara */
+    
 }
 
 .container {
-    width: 80%;
-    margin: 20px auto;
-    background: white;
-    padding: 10px; 
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-/*#form-input{
+    width: 100%;
+    max-width: 1200px; /* Aumente a largura máxima conforme necessário */
+    height: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
-}*/
-.form-header {
+    align-items: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 15px; /* Bordas mais arredondadas */
+}
+
+.form-header h1 {
     text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem; /* Tamanho da fonte maior */
+    color: #151f54; /* Cor mais escura para o título */
 }
 
 .content {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin-top: 10px; 
+    width: 100%;
+    gap: 3rem; /* Espaço entre o formulário e o gráfico */
 }
 
-.form {
-    flex: 1; 
-}
+@media (max-width: 768px) {
+    .form {
+      width: 90%;
+    }
+    .input-group {
+      flex-direction: column;
+    }
+    .input-box {
+      flex: 1 1 100%;
+    }
+  }
 
 .input-group {
     display: flex;
-    flex-wrap: wrap; 
-    justify-content: space-between;
-    flex-direction: column;
-    /*align-items: center;*/
+    flex-wrap: wrap;
+    gap: 1.5rem; /* Espaço entre os campos de input */
 }
 
 .input-box {
-    flex: 1 1 45%; 
-    margin-bottom: 10px;
+    flex: 1 1 calc(50% - 1.5rem); /* Cada campo ocupa 50% da largura */
+    display: flex;
+    flex-direction: column;
 }
 
-.input-box label {
-    margin-bottom: 5px;
+label {
+    margin-bottom: 0.5rem; /* Espaçamento entre o label e o input */
+    font-weight: 500;
+    color: #333333; /* Cor do texto dos labels */
 }
 
-.input-box input,
-.input-box select {
-    padding: 5px; 
-    border: 1px solid #ccc;
-    border-radius: 4px;
+input[type="text"],
+input[type="number"],
+select {
+    padding: 0.5rem;
+    border: 1px solid #dddddd;
+    border-radius: 5px; /* Bordas arredondadas nos inputs */
+    transition: border 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    border: 1px solid #007bff; /* Cor do border ao focar */
+    outline: none;
 }
 
 .button-group {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; /* Alinha os botões à direita */
+    gap: 0.2rem;
 }
 
-.button-group button {
-    padding: 6px; 
+button {
+    padding: 0.5rem 1rem;
     border: none;
-    border-radius: 4px;
-    background-color: #3b28a7;
-    color: white;
+    border-radius: 5px;
+    color: #ffffff;
+    background-color: #151f54; /* Cor do botão */
     cursor: pointer;
-    font-size: 0.9em; 
+    transition: background 0.3s;
 }
 
-.button-group button.limpar {
-    background-color: #dc3545;
+button:hover {
+    background-color: #263480; /* Cor do botão ao passar o mouse */
 }
 
-.button-group button:hover {
-    background-color: #218838;
+#resultados,
+#erros {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    color: #333333;
 }
 
-#resultados {
-    margin-top: 10px; 
-    flex: 1; 
-    overflow: auto; 
+ #resultados {
+    overflow: auto;
+    max-height: 500px; 
+  } 
+
+#grafico {
+    width: 100%;
+    height: auto;
+    margin-top: 1rem;
+} 
+
+.limpar-botao {
+    background-color: #FF0000; /* Vermelho */
+    color: #fff; /* Branco */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
+.limpar-botao:hover {
+    background-color: #cc4058; /* Vermelho mais claro */
+}
+
+.checkbox-label {
+    margin-top: 10px;
+}
+/*formatação da tabela*/
 table {
     width: 50%;
     border-collapse: collapse;
@@ -113,3 +171,4 @@ img {
     height: auto; 
     max-height: 60%; 
 }
+
