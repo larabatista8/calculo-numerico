@@ -57,6 +57,7 @@
                     <input type="checkbox" id="use-resultado-antigo">Usar resultado anterior
                 </label>
                 <input type="hidden" id="resultado-anterior">
+                <div id="resultado-anterior-exibicao" style="margin-top: 10px; color: blue;"></div>
                 <br> 
 
                 <div class="button-group">
@@ -83,16 +84,26 @@
     function calcular() {
         const metodo = document.getElementById("metodo").value;
         const funcao = document.getElementById("funcao").value;
-        const x0 = document.getElementById("x0").value;
-        const x1 = document.getElementById("x1").value;
         const tol = document.getElementById("tol").value;
         const max_iter = document.getElementById("max_iter").value;
+        const useResultadoAntigo = document.getElementById("use-resultado-antigo").checked;
+        const resultadoAnterior = document.getElementById("resultado-anterior").value;
 
-        // Validação
-        if (!funcao || !x0 || !tol || !max_iter) {
-            document.getElementById("erros").innerHTML = "Por favor, preencha todos os campos obrigatórios.";
-            return;
-        }
+    // Validação
+    if (!funcao || !tol || !max_iter) {
+        document.getElementById("erros").innerHTML = "Por favor, preencha todos os campos obrigatórios.";
+        return;
+    }
+
+        let x0 = document.getElementById("x0").value;
+        let x1 = document.getElementById("x1").value;
+
+    // Usar resultado anterior
+    if (useResultadoAntigo && resultadoAnterior) {
+        x0 = parseFloat(resultadoAnterior);
+    } else {
+        x0 = parseFloat(x0); // Certifique-se de usar o valor atual se o checkbox não estiver marcado
+    }
 
         const bodyData = { 
             metodo, 
@@ -123,6 +134,12 @@
     if (data.error) {
         document.getElementById("erros").innerHTML = 'Erro: ' + data.error;
     } else {
+        const resultado = data[metodo].resultado;
+        document.getElementById("resultado-anterior").value = resultado;
+
+        document.getElementById("resultado-anterior-exibicao").innerHTML = 
+        `Último resultado: ${resultado}`;
+
         let resultadosHtml = '<h3>Resultados:</h3>';
         if (metodo === 'todos') {
                 // Para todos os métodos
