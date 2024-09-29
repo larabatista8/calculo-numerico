@@ -134,10 +134,6 @@
     if (data.error) {
         document.getElementById("erros").innerHTML = 'Erro: ' + data.error;
     } else {
-        const resultado = data[metodo].resultado;
-        document.getElementById("resultado-anterior").value = resultado;
-
-        document.getElementById("resultado-anterior-exibicao").innerHTML = `Último resultado: ${resultado}`;
 
         let resultadosHtml = '<h3>Resultados:</h3>';
         if (metodo === 'todos') {
@@ -179,6 +175,10 @@
                     resultadosHtml += '</div></div>';
                 }
         } else {
+        const resultado = data[metodo].resultado;
+        document.getElementById("resultado-anterior").value = resultado;
+
+        document.getElementById("resultado-anterior-exibicao").innerHTML = `Último resultado: ${resultado}`;
             resultadosHtml += `<div class="result-container" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between; contents; margin-bottom: 50px;">
                                 <div style="flex: 1; margin-right: 20px;">
                                     <h2>${metodo.replace('_', ' ').toUpperCase()}</h2>
