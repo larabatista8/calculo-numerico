@@ -14,7 +14,14 @@ body {
     justify-content: center;
     align-items: center;
     background: #151f54; /* Cor de fundo mais clara */
-    
+   
+}
+
+body {
+    margin-left: 40px;
+    margin-right: 0px;
+    margin-top: 50px;
+    margin-bottom: 0px;
 }
 
 .container {
