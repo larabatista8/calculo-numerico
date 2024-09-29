@@ -119,41 +119,35 @@
         }
         return response.json();
     })
-        .then(data => {
-            if (data.error) {
-                document.getElementById("erros").innerHTML = 'Erro: ' + data.error;
-            } else {
-                let resultadosHtml = '<h3>Resultados:</h3>';
-                if (metodo === 'todos') {
-                    for (const [key, value] of Object.entries(data)) {
-                        resultadosHtml += `<div class="result-container">
-                                            <h2>${key.replace('_', ' ').toUpperCase()}</h2>
-                                            <p>Resultado: ${value.resultado}</p>
-                                            <img src="${value.grafico_url}" alt="Gráfico ${key.replace('_', ' ')}">`;
-
-                        if (value.iteracoes && value.iteracoes.length > 0) {
-                            resultadosHtml += '<table><thead><tr><th>Iteração</th><th>x</th><th>f(x)</th><th>Diferença</th></tr></thead><tbody>';
-                            value.iteracoes.forEach(iteracao => {
-                                resultadosHtml += `<tr>
-                                                      <td>${iteracao.iteracao}</td>
-                                                      <td>${iteracao.x}</td>
-                                                      <td>${iteracao.f_x}</td>
-                                                      <td>${iteracao.diferenca}</td>
-                                                   </tr>`;
-                            });
-                            resultadosHtml += '</tbody></table></div>';
-                        } else {
-                            resultadosHtml += '<p>Nenhuma iteração disponível.</p>';
-                        }
-                    }
-                } else {
-                    resultadosHtml += `<h2>${metodo.replace('_', ' ').toUpperCase()}</h2>
-                                       <p>Resultado: ${data[metodo].resultado}</p>
-                                       <img src="${data[metodo].grafico_url}" alt="Gráfico ${metodo.replace('_', ' ')}">`;
-
-                    if (data[metodo].iteracoes && data[metodo].iteracoes.length > 0) {
-                        resultadosHtml += '<table><thead><tr><th>Iteração</th><th>x</th><th>f(x)</th><th>Diferença</th></tr></thead><tbody>';
-                        data[metodo].iteracoes.forEach(iteracao => {
+    .then(data => {
+    if (data.error) {
+        document.getElementById("erros").innerHTML = 'Erro: ' + data.error;
+    } else {
+        let resultadosHtml = '<h3>Resultados:</h3>';
+        if (metodo === 'todos') {
+                // Para todos os métodos
+                for (const [key, value] of Object.entries(data)) {
+                    resultadosHtml += `<div class="result-container" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between; contents; margin-bottom: 50px;">
+                                <div style="flex: 1; margin-right: 20px;">
+                            <h2>${key.replace('_', ' ').toUpperCase()}</h2>
+                            <p>Resultado: ${value.resultado}</p>
+                            <img src="${value.grafico_url}" alt="Gráfico ${key.replace('_', ' ')}" style="max-width: 100%;">
+                        </div>`;
+                        
+                    
+                    if (value.iteracoes && value.iteracoes.length > 0) {
+                        resultadosHtml += `<div style="flex: 1; margin-right: 20px">
+                                            <table>
+                                              <thead>
+                                                <tr>
+                                                  <th>Iteração</th>
+                                                  <th>x</th>
+                                                  <th>f(x)</th>
+                                                  <th>Diferença</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>`;
+                        value.iteracoes.forEach(iteracao => {
                             resultadosHtml += `<tr>
                                                   <td>${iteracao.iteracao}</td>
                                                   <td>${iteracao.x}</td>
@@ -161,15 +155,51 @@
                                                   <td>${iteracao.diferenca}</td>
                                                </tr>`;
                         });
-                        resultadosHtml += '</tbody></table>';
+                        resultadosHtml += `</tbody></table>`;
                     } else {
                         resultadosHtml += '<p>Nenhuma iteração disponível.</p>';
                     }
-                }
 
-                document.getElementById("resultados").innerHTML = resultadosHtml;
+                    resultadosHtml += '</div></div>';
+                }
+        } else {
+            resultadosHtml += `<div class="result-container" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between; contents; margin-bottom: 50px;">
+                                <div style="flex: 1; margin-right: 20px;">
+                                    <h2>${metodo.replace('_', ' ').toUpperCase()}</h2>
+                                    <p>Resultado: ${data[metodo].resultado}</p>
+                                    <img src="${data[metodo].grafico_url}" alt="Gráfico ${metodo.replace('_', ' ')}" style="max-width: 100%;">
+                                </div>`;
+
+            if (data[metodo].iteracoes && data[metodo].iteracoes.length > 0) {
+                resultadosHtml += `<div style="flex: 1; margin-right: 20px">
+                                    <table>
+                                      <thead>
+                                        <tr>
+                                            <th>Iteração</th>
+                                            <th>x</th>
+                                            <th>f(x)</th>
+                                            <th>Diferença</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>`;
+                data[metodo].iteracoes.forEach(iteracao => {
+                    resultadosHtml += `<tr>
+                                        <td>${iteracao.iteracao}</td>
+                                        <td>${iteracao.x}</td>
+                                        <td>${iteracao.f_x}</td>
+                                        <td>${iteracao.diferenca}</td>
+                                       </tr>`;
+                });
+                resultadosHtml += `</tbody></table></div></div>`;
+            } else {
+                resultadosHtml += '<p>Nenhuma iteração disponível.</p>';
             }
-        })
+        }
+
+        document.getElementById("resultados").innerHTML = resultadosHtml;
+    }
+})
+
         .catch(error => {
             document.getElementById("erros").innerHTML = 'Erro no cálculo: ' + error.message;
         });
