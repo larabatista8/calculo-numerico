@@ -85,7 +85,7 @@ def newton_raphson(func_str, deriv_func_str, x0, tol, max_iter):
             "f_x": fx,
             "diferenca": abs(fx - tol)
         })
-        if abs(x1 - x0) < tol:
+        if abs(x1 - x0) < tol or abs(fx) < tol:
             break
         x0 = x1
         i += 1
