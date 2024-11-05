@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+body {
+    width: 100%;
+    height: 100vh;
+    
+    justify-content: center;
+    align-items: center;
+    background: #151f54; /* Cor de fundo mais clara */
+   
+}
+
+body {
+    margin-left: 40px;
+    margin-right: 0px;
+    margin-top: 50px;
+    margin-bottom: 0px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px; /* Aumente a largura máxima conforme necessário */
+    height: auto;
+    
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 15px; /* Bordas mais arredondadas */
+}
+
+button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    color: #ffffff;
+    background-color: #151f54; /* Cor do botão */
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #263480; /* Cor do botão ao passar o mouse */
+}
+
+.button-group {
+    display: flex;
+    justify-content: left; /* Alinha os botões à esquerda */
+    gap: 0.2rem;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.limpar-botao {
+    background-color: #FF0000; /* Vermelho */
+    color: #fff; /* Branco */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.limpar-botao:hover {
+    background-color: #cc4058; /* Vermelho mais claro */
+}
+
+label,p {
+    margin-bottom: 0.5rem; /* Espaçamento entre o label e o input */
+    font-weight: 500;
+    color: #333333; /* Cor do texto dos labels */
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem; /* Tamanho da fonte maior */
+    color: #151f54; /* Cor mais escura para o título */
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    padding: 0.5rem;
+    border: 2px solid #dddddd;
+    border-radius: 5px; 
+    transition: border 0.3s, box-shadow 0.3s; 
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    border: 2px solid #007bff; 
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); 
+    outline: none;
+}
+
+
+@media (max-width: 768px) {
+    .form {
+      width: 90%;
+    }
+    .input-group {
+      flex-direction: column;
+    }
+    .input-box {
+      flex: 1 1 100%;
+    }
+  }

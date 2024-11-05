@@ -1,1 +1,1 @@
-# calculo-numerico
+# segundo-projeto-CN
